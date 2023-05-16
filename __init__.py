@@ -91,10 +91,10 @@ class Post:
         return f"{justified_year}-{justified_month}-{justified_day}"
 
     def get_internal_name(self):    # YYYY-mm-dd-id, used for the filename
-        return f"{self.get_full_date}-{self.id}"
+        return f"{self.get_full_date()}-{self.id}"
 
     def get_filename(self):
-        return f"{self.get_internal_name}.md"
+        return f"{self.get_internal_name()}.md"
 
     def get_excerpt(self):  # Trimmed body, used in collection index pages
         body_substring = self.body.slice(0, 500)
