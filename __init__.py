@@ -1,3 +1,4 @@
+import datetime
 import pathlib
 import yaml
 
@@ -74,27 +75,25 @@ class Post:
         self.id = "blankpost"  # Used in the internal name
         self.title = "Blank Post"  # Display name
         self.thumbnail = ""  # Optional, thumbnail path/name???
-        self.date_year = 0
-        self.date_month = 1
-        self.date_day = 1
+        self.date = datetime.date.today()
         self.body = ""
 
         self.is_picturepost = is_picturepost  # Used in the generation method
         if self.is_picturepost:
             self.pictures = []  # Attached pictures
 
-    def get_full_date(self):
-        # Date in the YYYY-mm-dd format used by Jekyll
-        # this is ugly tbh
-        justified_year = str(self.date_year).ljust(4, "0")
-        justified_month = str(self.date_month).ljust(2, "0")
-        justified_day = str(self.date_day).ljust(2, "0")
+    def set_date(self, year, month, day):
+        year = str(year).rjust(4, "0")
+        month = str(month).rjust(2, "0")
+        day = str(day).rjust(2, "0")
 
-        return f"{justified_year}-{justified_month}-{justified_day}"
+        isoformat = f"{year}-{month}-{day}"
+
+        self.date = datetime.date.fromisoformat(isoformat)
 
     def get_internal_name(self):
         # YYYY-mm-dd-id, used for the filename
-        return f"{self.get_full_date()}-{self.id}"
+        return f"{self.date.isoformat()}-{self.id}"
 
     def get_filename(self):
         return f"{self.get_internal_name()}.md"
