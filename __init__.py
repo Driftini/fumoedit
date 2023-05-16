@@ -71,32 +71,36 @@ class PictureVariant:
 
 class Post:
     def __init__(self, is_picturepost=False):
-        self.id = "blankpost"       # Used in the internal name
-        self.title = "Blank Post"   # Display name
-        self.thumbnail = ""         # Optional, thumbnail path/name???
+        self.id = "blankpost"  # Used in the internal name
+        self.title = "Blank Post"  # Display name
+        self.thumbnail = ""  # Optional, thumbnail path/name???
         self.date_year = 0
         self.date_month = 1
         self.date_day = 1
         self.body = ""
 
-        self.is_picturepost = is_picturepost  # Used in the file generation method
+        self.is_picturepost = is_picturepost  # Used in the generation method
         if self.is_picturepost:
-            self.pictures = []              # Attached pictures
+            self.pictures = []  # Attached pictures
 
-    def get_full_date(self):  # Date in the YYYY-mm-dd format used by Jekyll
-        justified_year = self.date_year.ljust(4, "0")
-        justified_month = self.date_month.ljust(2, "0")
-        justified_day = self.date_day.ljust(2, "0")
+    def get_full_date(self):
+        # Date in the YYYY-mm-dd format used by Jekyll
+        # this is ugly tbh
+        justified_year = str(self.date_year).ljust(4, "0")
+        justified_month = str(self.date_month).ljust(2, "0")
+        justified_day = str(self.date_day).ljust(2, "0")
 
         return f"{justified_year}-{justified_month}-{justified_day}"
 
-    def get_internal_name(self):    # YYYY-mm-dd-id, used for the filename
+    def get_internal_name(self):
+        # YYYY-mm-dd-id, used for the filename
         return f"{self.get_full_date()}-{self.id}"
 
     def get_filename(self):
         return f"{self.get_internal_name()}.md"
 
-    def get_excerpt(self):  # Trimmed body, used in collection index pages
+    def get_excerpt(self):
+        # Trimmed body, used in collection index pages
         body_substring = self.body.slice(0, 500)
 
         return f"{body_substring}..."
