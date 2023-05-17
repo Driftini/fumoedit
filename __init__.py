@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 import pathlib
 import yaml
 
@@ -75,7 +75,7 @@ class Post:
         self.id = "blankpost"  # Used in the internal name
         self.title = "Blank Post"  # Display name
         self.thumbnail = ""  # Optional, thumbnail path/name???
-        self.date = datetime.date.today()
+        self.date = date.today()
         self.body = ""
 
         self.is_picturepost = is_picturepost  # Used in the generation method
@@ -83,13 +83,7 @@ class Post:
             self.pictures = []  # Attached pictures
 
     def set_date(self, year, month, day):
-        year = str(year).rjust(4, "0")
-        month = str(month).rjust(2, "0")
-        day = str(day).rjust(2, "0")
-
-        isoformat = f"{year}-{month}-{day}"
-
-        self.date = datetime.date.fromisoformat(isoformat)
+        self.date = date(year, month, day)
 
     def get_internal_name(self):
         # YYYY-mm-dd-id, used for the filename
