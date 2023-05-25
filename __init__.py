@@ -5,7 +5,7 @@ import yaml
 
 class Picture:
     def __init__(self, path="/assets/idk.jpg",
-                 offset=("center", "center"), variants=[]):
+                 offset=["center", "center"], variants=[]):
         self.thumbnail_path = path
         self.thumbnail_offset = offset
         self.variants = variants
