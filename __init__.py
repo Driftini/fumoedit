@@ -71,16 +71,16 @@ class PictureVariant:
 
 
 class Post:
-    def __init__(self, is_picturepost=False):
+    def __init__(self):
         self.id = "blankpost"  # Used in the internal name
         self.title = "Blank Post"  # Display name
         self.thumbnail = ""  # Optional, thumbnail path/name???
         self.date = date.today()
         self.body = ""
+        self.pictures = []  # Attached pictures
 
-        self.is_picturepost = is_picturepost  # Used in the generation method
-        if self.is_picturepost:
-            self.pictures = []  # Attached pictures
+    def is_picturepost(self):
+        return len(self.pictures) > 0
 
     def set_date(self, year, month, day):
         self.date = date(year, month, day)
@@ -111,7 +111,7 @@ class Post:
             "title": self.title
         }
 
-        if self.is_picturepost:
+        if self.is_picturepost():
             d.update({"pictures": self.get_pictures_dicts()})
 
         if len(self.thumbnail) > 0:
