@@ -2,13 +2,20 @@ from datetime import date
 import pathlib
 import yaml
 
+SITE_ROOT = ""  # Path to site root
 
 class Picture:
-    def __init__(self, path="/assets/idk.jpg",
-                 offset=["center", "center"], variants=[]):
-        self.thumbnail_path = path
-        self.thumbnail_offset = offset
-        self.variants = variants
+    def __init__(self, collection):
+        self.thumbnail_name = ""
+        self.thumbnail_offset = ["center", "center"]
+        self.variants = []
+        self.collection = collection # Reference to the post's collection
+
+    def new_variant(self):
+        self.variants.append(PictureVariant(self.collection))
+
+    def get_thumbnail_path(self):
+        return f"{SITE_ROOT}/assets/img/posts/{self.collection}/thumbs/{self.thumbnail_name}.jpg"
 
     def get_full_offset(self):
         x = self.thumbnail_offset[0]
@@ -31,7 +38,7 @@ class Picture:
 
     def get_dict(self):
         d = {
-            "thumbnail": self.thumbnail_path,
+            "thumbnail": self.get_thumbnail_path(),
             "thumbpos": self.get_full_offset(),
             "variants": self.get_variants_dicts()
         }
@@ -43,9 +50,13 @@ class Picture:
 
 
 class PictureVariant:
-    def __init__(self, path="/gggah.png", label=""):
-        self.path = path
-        self.label = label
+    def __init__(self, collection):
+        self.filename = ""
+        self.label = ""
+        self.collection = collection # Reference to the post's collection
+
+    def get_path(self):
+        return f"{SITE_ROOT}/assets/img/posts/{self.collection}/{self.filename}"
 
     def has_label(self):
         if len(self.label) > 0:
@@ -79,18 +90,29 @@ class Post:
         self.body = ""
         self.pictures = []  # Attached pictures
 
-    def is_picturepost(self):
-        return len(self.pictures) > 0
+        # Internal name of the post's collection (blog, walls...)
+        self.collection = "blog"
 
     def set_date(self, year, month, day):
         self.date = date(year, month, day)
+
+    def new_picture(self):
+        if self.is_picturepost():
+            self.pictures.append(Picture(self.collection))
+
+    def is_picturepost(self):
+        return self.collection != "blog"  # and len(self.pictures) > 0
 
     def get_internal_name(self):
         # YYYY-mm-dd-id, used for the filename
         return f"{self.date.isoformat()}-{self.id}"
 
     def get_filename(self):
+        # is this really needed anymore?
         return f"{self.get_internal_name()}.md"
+
+    def get_full_path(self):
+        return f"{SITE_ROOT}/{self.collection}/{self.get_filename()}"
 
     def get_excerpt(self):
         # Trimmed body, used in collection index pages
