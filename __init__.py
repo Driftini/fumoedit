@@ -72,7 +72,7 @@ class PictureVariant:
 
     def get_dict(self):
         d = {
-            "file": self.path
+            "file": self.get_path()
         }
 
         if self.has_label():
@@ -112,13 +112,16 @@ class Post:
         return f"{self.get_internal_name()}.md"
 
     def get_full_path(self):
-        return f"{SITE_ROOT}/{self.collection}/{self.get_filename()}"
+        return f"{SITE_ROOT}/_{self.collection}/{self.get_filename()}"
 
     def get_excerpt(self):
         # Trimmed body, used in collection index pages
         body_substring = self.body.slice(0, 500)
 
         return f"{body_substring}..."
+
+    def get_thumbnail_path(self):
+        return f"{SITE_ROOT}/assets/img/{self.collection}/{self.thumbnail}"
 
     def get_pictures_dicts(self):
         dicts = []
@@ -137,7 +140,7 @@ class Post:
             d.update({"pictures": self.get_pictures_dicts()})
 
         if len(self.thumbnail) > 0:
-            d.update({"thumbnail": self.thumbnail})
+            d.update({"thumbnail": self.get_thumbnail_path()})
 
         return d
 
