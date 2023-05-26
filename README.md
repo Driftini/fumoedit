@@ -6,4 +6,3 @@ A simple Python module I plan to use as the backbone for a proper editor for [my
 * [x] Generation of posts
 * [ ] Reading a post file and instancing a Post class from it
 * [ ] PostCollection class
-* [ ] Reading 
