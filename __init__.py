@@ -55,9 +55,9 @@ class PictureVariant:
 
     def get_label(self):
         if self.has_label():
-            return "<no label>"
-        else:
             return self.label
+        else:
+            return "<no label>"
 
     def get_dict(self):
         d = {
