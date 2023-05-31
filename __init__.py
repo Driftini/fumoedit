@@ -19,8 +19,11 @@ class Picture:
 
         return v
 
+    def get_collection(self):
+        return self.collection[0]
+
     def get_thumbnail_path(self):
-        return f"/assets/img/posts/{self.collection}/thumbs/{self.thumbnail_name}"
+        return f"/assets/img/posts/{self.get_collection()}/thumbs/{self.thumbnail_name}"
 
     def get_full_offset(self):
         x = self.thumbnail_offset[0]
@@ -60,8 +63,11 @@ class PictureVariant:
         self.label = ""
         self.collection = collection  # Reference to the post's collection
 
+    def get_collection(self):
+        return self.collection[0]
+
     def get_path(self):
-        return f"/assets/img/posts/{self.collection}/{self.filename}"
+        return f"/assets/img/posts/{self.get_collection[0]}/{self.filename}"
 
     def has_label(self):
         if len(self.label) > 0:
@@ -96,7 +102,7 @@ class Post:
         self.pictures = []  # Attached pictures
 
         # Internal name of the post's collection (blog, walls...)
-        self.collection = "blog"
+        self.set_collection("blog")
 
     def set_date(self, year, month, day):
         year, month, day = int(year), int(month), int(day)
@@ -110,8 +116,15 @@ class Post:
 
             return p
 
+    def set_collection(self, collection):
+        # Wrapped in an array so it can be passed by reference
+        self.collection = [collection]
+
+    def get_collection(self):
+        return self.collection[0]
+
     def is_picturepost(self):
-        return self.collection != "blog"  # and len(self.pictures) > 0
+        return self.get_collection() != "blog"
 
     def get_internal_name(self):
         # YYYY-mm-dd-id, used for the filename
@@ -122,7 +135,7 @@ class Post:
         return f"{self.get_internal_name()}.md"
 
     def get_thumbnail_path(self):
-        return f"/assets/img/{self.collection}/{self.thumbnail}"
+        return f"/assets/img/{self.get_collection()}/{self.thumbnail}"
 
     def get_excerpt(self):
         # Trimmed body, used in collection index pages
@@ -203,7 +216,7 @@ def load_post_file(filepath):
 
         post.set_date(metadata[0], metadata[1], metadata[2])
         post.id = metadata[3]
-        post.collection = Path(filepath).parts[-2]
+        post.set_collection(Path(filepath).parts[-2])
 
         # Setup post properties
         post.title = props["title"]
