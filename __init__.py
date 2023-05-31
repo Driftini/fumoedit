@@ -102,6 +102,7 @@ class Post:
         self.pictures = []  # Attached pictures
 
         # Internal name of the post's collection (blog, walls...)
+        self.collection = [None]
         self.set_collection("blog")
 
     def set_date(self, year, month, day):
@@ -118,7 +119,7 @@ class Post:
 
     def set_collection(self, collection):
         # Wrapped in an array so it can be passed by reference
-        self.collection = [collection]
+        self.collection[0] = collection
 
     def get_collection(self):
         return self.collection[0]
