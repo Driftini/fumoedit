@@ -190,7 +190,7 @@ def filename_valid(filename):
         return False
 
 
-def save_post_file(post, folderpath):
+def post_to_file(post, folderpath):
     # Post files can be freely saved to any folder
     # (collection info may be lost because of poor design)
     with open(f"{folderpath}/{post.get_filename()}",
@@ -199,7 +199,7 @@ def save_post_file(post, folderpath):
         f.write(content)
 
 
-def load_post_file(filepath):
+def post_from_file(filepath):
     basename = path.basename(filepath)
 
     if filename_valid(basename):
