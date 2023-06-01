@@ -219,7 +219,13 @@ def post_from_file(filepath):
 
         post.set_date(metadata[0], metadata[1], metadata[2])
         post.id = metadata[3]
-        post.set_collection(Path(filepath).parts[-2])
+
+        collection_folder = Path(filepath).parts[-2]
+
+        if collection_folder[0] == "_":
+            collection_folder = collection_folder[1:]
+
+        post.set_collection(collection_folder)
 
         # Setup post properties
         post.title = props["title"]
