@@ -6,6 +6,7 @@ import yaml
 
 SITE_ROOT = Path(".")  # Path to site root
 
+
 class Picture:
     def __init__(self, collection):
         self.thumbnail_name = ""  # ext MUST be .jpg
@@ -101,9 +102,9 @@ class Post:
         self.body = ""
         self.pictures = []  # Attached pictures
 
-        # Internal name of the post's collection (blog, walls...)
+        # Internal name of the post's collection (posts, walls...)
         self.collection = [None]
-        self.set_collection("blog")
+        self.set_collection("posts")
 
     def set_date(self, year, month, day):
         year, month, day = int(year), int(month), int(day)
@@ -125,7 +126,7 @@ class Post:
         return self.collection[0]
 
     def is_picturepost(self):
-        return self.get_collection() != "blog"
+        return self.get_collection() != "posts"
 
     def get_internal_name(self):
         # YYYY-mm-dd-id, used for the filename
@@ -196,7 +197,8 @@ def save_post_file(post, folderpath):
               mode="w", encoding="utf-8") as f:
         content = post.generate()
         f.write(content)
-    
+
+
 def load_post_file(filepath):
     basename = path.basename(filepath)
 
