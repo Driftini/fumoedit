@@ -68,7 +68,7 @@ class PictureVariant:
         return self.collection[0]
 
     def get_path(self):
-        return f"/assets/img/posts/{self.get_collection[0]}/{self.filename}"
+        return f"/assets/img/posts/{self.get_collection()[0]}/{self.filename}"
 
     def has_label(self):
         if len(self.label) > 0:
@@ -190,11 +190,20 @@ def filename_valid(filename):
         return False
 
 def get_folderpath(filepath):
+    # Get the parent folder if filepath is a post's
+    if filepath[-3:] == ".md":
+        return Path(filepath).parents[0]
+    else:
+        return filepath
+
+def get_foldername(filepath):
     return Path(filepath).parts[-2]
 
 def post_to_file(post, folderpath):
     # Post files can be freely saved to any folder
     # (collection info may be lost because of poor design)
+    folderpath = path.normpath(folderpath)
+
     with open(f"{folderpath}/{post.get_filename()}",
               mode="w", encoding="utf-8") as f:
         content = post.generate()
@@ -223,7 +232,7 @@ def post_from_file(filepath):
             post.id = metadata[3]
 
             # Retrieve collection from the post's containing folder's name
-            collection_name = get_folderpath(filepath)
+            collection_name = get_foldername(filepath)
             collection_name = collection_name[1:] # shave off the underscore
 
             post.set_collection(collection_name)
