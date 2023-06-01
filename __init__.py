@@ -206,53 +206,68 @@ def post_from_file(filepath):
         with open(filepath, mode="r", encoding="utf-8") as f:
             content = f.read()
 
-        content = content.split("---\n")
-        props = yaml.load(content[1], yaml.Loader)
-        body = content[2]
+        try:
+            post = Post()
 
-        # Post setup
-        post = Post()
+            content = content.split("---\n")
+            props = yaml.load(content[1], yaml.Loader)
+            body = content[2]
 
-        # Setup post metadata (date, ID, collection)
-        metadata = basename[:-3]  # trim file extension (always .md)
-        metadata = metadata.split("-")  # split year, month, day and ID
+            # Setup post metadata (date, ID, collection)
+            metadata = basename[:-3]  # trim file extension (always .md)
+            metadata = metadata.split("-")  # split year, month, day and ID
 
-        post.set_date(metadata[0], metadata[1], metadata[2])
-        post.id = metadata[3]
+            post.set_date(metadata[0], metadata[1], metadata[2])
+            post.id = metadata[3]
 
-        collection_folder = Path(filepath).parts[-2]
+            # Retrieve collection from the post's containing folder's name
+            collection_name = Path(filepath).parts[-2]
+            collection_name = collection_name[1:]
 
-        if collection_folder[0] == "_":
-            collection_folder = collection_folder[1:]
+            post.set_collection(collection_name)
 
-        post.set_collection(collection_folder)
+            # Setup post properties
+            post.title = props["title"]
+            post.body = body
+            if "thumbnail" in props:
+                post.thumbnail = props["thumbnail"]
 
-        # Setup post properties
-        post.title = props["title"]
-        post.body = body
-        if "thumbnail" in props:
-            post.thumbnail = props["thumbnail"]
+            # Setup post attachments
+            if post.is_picturepost() and "pictures" in props:
+                for p in props["pictures"]:
+                    picture_obj = post.new_picture()
 
-        # Setup post attachments
-        if post.is_picturepost() and "pictures" in props:
-            for p in props["pictures"]:
-                picture_obj = post.new_picture()
+                    picture_obj.thumbnail_name = path.basename(p["thumbnail"])
+                    picture_obj.thumbnail_offset = p["thumbpos"].split(" ")
 
-                picture_obj.thumbnail_name = path.basename(p["thumbnail"])
-                picture_obj.thumbnail_offset = p["thumbpos"].split(" ")
+                    for i in range(0, 2):
+                        if picture_obj.thumbnail_offset[i] != "center":
+                            # Shave off the "px" suffix
+                            picture_obj.thumbnail_offset[i] = picture_obj.thumbnail_offset[i][:-2]
+                            picture_obj.thumbnail_offset[i] = int(
+                                picture_obj.thumbnail_offset[i])
 
-                for i in range(0, 2):
-                    if picture_obj.thumbnail_offset[i] != "center":
-                        # Shave off the "px" suffix
-                        picture_obj.thumbnail_offset[i] = picture_obj.thumbnail_offset[i][:-2]
-                        picture_obj.thumbnail_offset[i] = int(picture_obj.thumbnail_offset[i])
+                    if "variants" in p:
+                        for v in p["variants"]:
+                            variant_obj = picture_obj.new_variant()
 
-                if "variants" in p:
-                    for v in p["variants"]:
-                        variant_obj = picture_obj.new_variant()
+                            variant_obj.filename = path.basename(v["file"])
+                            if "label" in v:
+                                variant_obj.label = v["label"]
 
-                        variant_obj.filename = path.basename(v["file"])
-                        if "label" in v:
-                            variant_obj.label = v["label"]
+            return post
+        except yaml.scanner.ScannerError as e:
+            e.add_note(f"{filepath}'s front matter's syntax is invalid.")
+            raise
+        except (KeyError, AttributeError):
+            e.add_note(f"{filepath}'s metadata or properties are invalid.")
+            raise
+    else:
+        e = PostNameError()
+        e.add_note(f"{filepath}'s name is invalid.")
+        raise e
 
-        return post
+# Exceptions
+
+class PostNameError(Exception):
+    pass
