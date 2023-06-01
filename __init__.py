@@ -189,6 +189,8 @@ def filename_valid(filename):
     else:
         return False
 
+def get_folderpath(filepath):
+    return Path(filepath).parts[-2]
 
 def post_to_file(post, folderpath):
     # Post files can be freely saved to any folder
@@ -221,8 +223,8 @@ def post_from_file(filepath):
             post.id = metadata[3]
 
             # Retrieve collection from the post's containing folder's name
-            collection_name = Path(filepath).parts[-2]
-            collection_name = collection_name[1:]
+            collection_name = get_folderpath(filepath)
+            collection_name = collection_name[1:] # shave off the underscore
 
             post.set_collection(collection_name)
 
