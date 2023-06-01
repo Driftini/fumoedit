@@ -245,6 +245,7 @@ def post_from_file(filepath):
                     if picture_obj.thumbnail_offset[i] != "center":
                         # Shave off the "px" suffix
                         picture_obj.thumbnail_offset[i] = picture_obj.thumbnail_offset[i][:-2]
+                        picture_obj.thumbnail_offset[i] = int(picture_obj.thumbnail_offset[i])
 
                 if "variants" in p:
                     for v in p["variants"]:
