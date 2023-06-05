@@ -9,7 +9,7 @@ SITE_ROOT = Path(".")  # Path to site root
 
 class Picture:
     def __init__(self, collection):
-        self.thumbnail_name = ""  # ext MUST be .jpg
+        self.thumbnail_name = ""
         self.thumbnail_offset = ["center", "center"]
         self.variants = []
         self.collection = collection  # Reference to the post's collection
@@ -189,6 +189,7 @@ def filename_valid(filename):
     else:
         return False
 
+
 def get_folderpath(filepath):
     # Get the parent folder if filepath is a post's
     if filepath[-3:] == ".md":
@@ -196,8 +197,10 @@ def get_folderpath(filepath):
     else:
         return filepath
 
+
 def get_foldername(filepath):
     return Path(filepath).parts[-2]
+
 
 def post_to_file(post, folderpath):
     # Post files can be freely saved to any folder
@@ -220,10 +223,10 @@ def post_from_file(filepath):
         try:
             post = Post()
 
-            content = content.split("---\n")
+            content = content.split("---\n", 2)
             props = yaml.load(content[1], yaml.Loader)
             body = content[2]
-            body = body[:-1] # Erase trailing newline
+            body = body[:-1]  # Erase trailing newline
 
             # Setup post metadata (date, ID, collection)
             metadata = basename[:-3]  # trim file extension (always .md)
@@ -234,7 +237,7 @@ def post_from_file(filepath):
 
             # Retrieve collection from the post's containing folder's name
             collection_name = get_foldername(filepath)
-            collection_name = collection_name[1:] # shave off the underscore
+            collection_name = collection_name[1:]  # shave off the underscore
 
             post.set_collection(collection_name)
 
@@ -271,13 +274,14 @@ def post_from_file(filepath):
         except yaml.scanner.ScannerError as e:
             e.add_note(f"{filepath}'s front matter's syntax is invalid.")
             raise
-        except (KeyError, AttributeError):
+        except (KeyError, AttributeError) as e:
             e.add_note(f"{filepath}'s metadata or properties are invalid.")
             raise
     else:
         e = PostNameError()
         e.add_note(f"{filepath}'s name is invalid.")
         raise e
+
 
 # Exceptions
 
