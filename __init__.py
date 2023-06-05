@@ -223,6 +223,7 @@ def post_from_file(filepath):
             content = content.split("---\n")
             props = yaml.load(content[1], yaml.Loader)
             body = content[2]
+            body = body[:-1] # Erase trailing newline
 
             # Setup post metadata (date, ID, collection)
             metadata = basename[:-3]  # trim file extension (always .md)
