@@ -271,16 +271,12 @@ def post_from_file(filepath):
                                 variant_obj.label = v["label"]
 
             return post
-        except yaml.scanner.ScannerError as e:
-            e.add_note(f"{filepath}'s front matter's syntax is invalid.")
+        except yaml.scanner.ScannerError:
             raise
-        except (KeyError, AttributeError) as e:
-            e.add_note(f"{filepath}'s metadata or properties are invalid.")
+        except (KeyError, AttributeError):
             raise
     else:
-        e = PostNameError()
-        e.add_note(f"{filepath}'s name is invalid.")
-        raise e
+        raise PostNameError
 
 
 # Exceptions
