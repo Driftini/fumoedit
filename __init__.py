@@ -245,7 +245,7 @@ def post_from_file(filepath):
             post.title = props["title"]
             post.body = body
             if "thumbnail" in props:
-                post.thumbnail = props["thumbnail"]
+                post.thumbnail = path.basename(props["thumbnail"])
 
             # Setup post attachments
             if post.is_picturepost() and "pictures" in props:
