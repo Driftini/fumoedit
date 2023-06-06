@@ -4,8 +4,6 @@ from pathlib import Path
 import re
 import yaml
 
-SITE_ROOT = Path(".")  # Path to site root
-
 
 class Picture:
     def __init__(self, collection):
@@ -68,7 +66,7 @@ class PictureVariant:
         return self.collection[0]
 
     def get_path(self):
-        return f"/assets/img/posts/{self.get_collection()[0]}/{self.filename}"
+        return f"/assets/img/posts/{self.get_collection()}/{self.filename}"
 
     def has_label(self):
         if len(self.label) > 0:
@@ -229,7 +227,6 @@ def post_from_file(filepath):
                 # whose indentation breaks PyYAML and that have
                 # a slightly different structure (hardcoded variant names)
                 compat_mode = True
-                print(f"COMPAT MODE ON FOR {filepath}")
 
             if compat_mode:
                 # Remove indentation to make the file readable by PyYAML
@@ -239,7 +236,6 @@ def post_from_file(filepath):
                 for line in lines:
                     parts[1] += line.lstrip() + "\n"
 
-            print(parts[1])
             props = yaml.load(parts[1], yaml.Loader)
             body = parts[2]
             body = body[:-1]  # Erase trailing newline
@@ -278,7 +274,9 @@ def post_from_file(filepath):
                             if "px" in picture_obj.thumbnail_offset[i]:
                                 picture_obj.thumbnail_offset[i] = picture_obj.thumbnail_offset[i][:-2]
 
-                            picture_obj.thumbnail_offset[i] = int(picture_obj.thumbnail_offset[i])
+                            picture_obj.thumbnail_offset[i] = int(
+                                picture_obj.thumbnail_offset[i]
+                            )
 
                     if not compat_mode:
                         if "variants" in p:
