@@ -218,20 +218,37 @@ def post_from_file(filepath):
 
     if filename_valid(basename):
         with open(filepath, mode="r", encoding="utf-8") as f:
-            content = f.read()
+            file_content = f.read()
 
         try:
-            post = Post()
+            compat_mode = False
+            parts = file_content.split("---\n", 2)
 
-            content = content.split("---\n", 2)
-            props = yaml.load(content[1], yaml.Loader)
-            body = content[2]
+            if "[" in parts[1]:
+                # Square brackets were used in pre-FumoEdit posts,
+                # whose indentation breaks PyYAML and that have
+                # a slightly different structure (hardcoded variant names)
+                compat_mode = True
+                print(f"COMPAT MODE ON FOR {filepath}")
+
+            if compat_mode:
+                # Remove indentation to make the file readable by PyYAML
+                lines = parts[1].split("\n")
+                parts[1] = ""
+
+                for line in lines:
+                    parts[1] += line.lstrip() + "\n"
+
+            print(parts[1])
+            props = yaml.load(parts[1], yaml.Loader)
+            body = parts[2]
             body = body[:-1]  # Erase trailing newline
 
             # Setup post metadata (date, ID, collection)
             metadata = basename[:-3]  # trim file extension (always .md)
             metadata = metadata.split("-")  # split year, month, day and ID
 
+            post = Post()
             post.set_date(metadata[0], metadata[1], metadata[2])
             post.id = metadata[3]
 
@@ -257,19 +274,34 @@ def post_from_file(filepath):
 
                     for i in range(0, 2):
                         if picture_obj.thumbnail_offset[i] != "center":
-                            # Shave off the "px" suffix
-                            picture_obj.thumbnail_offset[i] = picture_obj.thumbnail_offset[i][:-2]
-                            picture_obj.thumbnail_offset[i] = int(
-                                picture_obj.thumbnail_offset[i])
+                            # Shave off the "px" suffix, if present
+                            if "px" in picture_obj.thumbnail_offset[i]:
+                                picture_obj.thumbnail_offset[i] = picture_obj.thumbnail_offset[i][:-2]
 
-                    if "variants" in p:
-                        for v in p["variants"]:
-                            variant_obj = picture_obj.new_variant()
+                            picture_obj.thumbnail_offset[i] = int(picture_obj.thumbnail_offset[i])
 
-                            variant_obj.filename = path.basename(v["file"])
-                            if "label" in v:
-                                variant_obj.label = v["label"]
+                    if not compat_mode:
+                        if "variants" in p:
+                            for v in p["variants"]:
+                                variant_obj = picture_obj.new_variant()
 
+                                variant_obj.filename = path.basename(v["file"])
+                                if "label" in v:
+                                    variant_obj.label = v["label"]
+                    else:
+                        # Pre-FumoEdit posts' pictures didn't have a variant
+                        # list, instead using the following names
+                        outdated_names = ["lowres", "maxres"]
+
+                        for n in outdated_names:
+                            if n in p:
+                                variant_obj = picture_obj.new_variant()
+
+                                variant_obj.filename = path.basename(
+                                    p[n]["file"]
+                                )
+                                if "label" in p[n]:
+                                    variant_obj.label = p[n]["label"]
             return post
         except yaml.scanner.ScannerError:
             raise
