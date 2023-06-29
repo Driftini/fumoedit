@@ -1,10 +1,7 @@
 from datetime import date
 from os import path
-from pathlib import Path
 import re
 import yaml
-
-SITE_ROOT = Path(".")  # Path to site root
 
 
 class Picture:
@@ -184,22 +181,15 @@ class Post:
 
 
 def filename_valid(filename):
+    # Verify if filename follows the YYYY-MM-DD-ID.md format
     if re.search("^\d{4}-\d{2}-\d{2}-.+(\.md)$", filename):
         return True
     else:
         return False
 
 
-def get_folderpath(filepath):
-    # Get the parent folder if filepath is a post's
-    if filepath[-3:] == ".md":
-        return Path(filepath).parents[0]
-    else:
-        return filepath
-
-
 def get_foldername(filepath):
-    return Path(filepath).parts[-2]
+    return filepath.split("/")[-2]
 
 
 def post_to_file(post, folderpath):
