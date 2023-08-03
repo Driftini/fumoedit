@@ -134,7 +134,7 @@ class Post:
         return f"{self.get_internal_name()}.md"
 
     def get_thumbnail_path(self):
-        return f"/assets/img/{self.get_collection()}/{self.thumbnail}"
+        return f"/assets/img/posts/{self.get_collection()}/{self.thumbnail}"
 
     def get_excerpt(self):
         # Trimmed body, used in collection index pages
@@ -250,7 +250,8 @@ def post_from_file(filepath):
             post.title = props["title"]
             post.body = body
             if "thumbnail" in props:
-                post.thumbnail = path.basename(props["thumbnail"])
+                thumbpath_prefix = f"/assets/img/posts/{post.get_collection()}/"
+                post.thumbnail = props["thumbnail"].removeprefix(thumbpath_prefix)
 
             # Setup post attachments
             if post.is_picturepost() and "pictures" in props:
