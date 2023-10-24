@@ -206,11 +206,8 @@ def post_from_file(filepath):
                 # Upgrade the post one version at a time,
                 # until it's fully up to date
                 while post_version < CURRENT_POST_VERSION:
-                    print(f"{basename} V{post_version} front matter:\n---\n{parts[0]}\n---")
-                    print(f"Upgrading {basename} from V{post_version} to V{post_version + 1}...")
                     exec(f"parts[0] = upgrade_from_v{post_version}({parts})")
                     post_version += 1
-                    print("Successful!")
 
             # Now that the post is up to date, it can be loaded normally
             props = yaml.load(parts[0], yaml.Loader)
@@ -226,7 +223,7 @@ def post_from_file(filepath):
             post.id = metadata[3]
 
             # Retrieve collection from the post's containing folder's name
-            collection_name = path.dirname(filepath)
+            collection_name = path.dirname(filepath).split("/")[-1]
             collection_name = collection_name[1:]  # shave off the underscore
 
             post.set_collection(collection_name)
@@ -297,7 +294,7 @@ def upgrade_from_v2(parts):
             # Thumbnail offset gets reset to 50%,
             # since double px offsets have been dropped
 
-            p["original"] = p["variants"][0]["file"]
+            p["original"] = path.basename(p["variants"][0]["file"])
 
             if ("label" in p["variants"][0]):
                 p["label"] = p["variants"][0]["label"]
