@@ -96,7 +96,7 @@ class Post:
         return f"{self.get_internal_name()}.md"
 
     def get_thumbnail_path(self):
-        collection_foldername = {self.get_collection()}
+        collection_foldername = self.get_collection()
 
         if collection_foldername == "posts":
             collection_foldername = "blog"
@@ -191,9 +191,12 @@ def post_from_file(filepath):
                 # whose indentation breaks PyYAML and that have
                 # hardcoded variant names (lowres/maxres)
                 post_version = 1
-            elif "variants:" in parts[0]:
-                # Picture variants were last used in
-                # pre-FumoNet redesign (V2) posts
+            elif (
+                "variants:" in parts[0]
+                or "thumbnail:" in parts[0]
+            ):
+                # Picture variants and the "thumbnail" post property
+                # were last used in pre-FumoNet redesign (V2) posts
                 post_version = 2
 
             if post_version < CURRENT_POST_VERSION:
@@ -285,6 +288,7 @@ def upgrade_from_v1(parts):
 def upgrade_from_v2(parts):
     # Set every picture's V3 properties based on the first
     # variant's properties, while discarding any additional variants
+    # Finally, rename priority thumbnail property
 
     props = yaml.load(parts[0], yaml.Loader)
 
@@ -300,6 +304,10 @@ def upgrade_from_v2(parts):
                 p["label"] = p["variants"][0]["label"]
 
             p.pop("variants")
+
+    if "thumbnail" in props:
+        props["prioritythumb"] = props["thumbnail"]
+        del props["thumbnail"]
 
     parts[0] = yaml.dump(props)
 
