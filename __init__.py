@@ -59,6 +59,7 @@ class Post:
         self.priority_thumbnail = ""  # Optional thumbnail override
         self.date = date.today()
         self.body = ""
+        self.tags = []
         self.pictures = []  # Attached pictures
 
         # Internal name of the post's collection (posts, walls...)
@@ -122,6 +123,9 @@ class Post:
 
         if len(self.priority_thumbnail) > 0:
             d.update({"prioritythumb": self.get_thumbnail_path()})
+
+        if len(self.tags) > 0:
+            d.update({"tags": self.tags})
 
         return d
 
@@ -236,6 +240,9 @@ def post_from_file(filepath):
             post.body = body
             if "prioritythumb" in props:
                 post.priority_thumbnail = path.basename(props["prioritythumb"])
+
+            if tags in props:
+                post.tags = props["tags"]
 
             # Setup post attachments
             if post.is_picturepost() and "pictures" in props:
