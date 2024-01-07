@@ -197,10 +197,10 @@ def post_from_file(filepath):
                 post_version = 1
             elif (
                 "variants:" in parts[0]
-                or "thumbnail:" in parts[0]
+                or "thumbnail" in yaml.load(parts[0], yaml.Loader)
             ):
-                # Picture variants and the "thumbnail" post property
-                # were last used in pre-FumoNet redesign (V2) posts
+                # Picture variants and the "thumbnail" POST (not picture)
+                # property were last used in pre-redesign (V2) posts
                 post_version = 2
 
             if post_version < CURRENT_POST_VERSION:
@@ -241,7 +241,7 @@ def post_from_file(filepath):
             if "prioritythumb" in props:
                 post.priority_thumbnail = path.basename(props["prioritythumb"])
 
-            if tags in props:
+            if "tags" in props:
                 post.tags = props["tags"]
 
             # Setup post attachments
