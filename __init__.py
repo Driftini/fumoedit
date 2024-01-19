@@ -6,6 +6,29 @@ import yaml
 CURRENT_POST_VERSION = 3
 
 
+class Collection:
+    def __init__(self, id, label):
+        self.id = id
+        self.label = label
+        # img_id only really exists because
+        # of blog using both "posts" and "blog"
+
+    def get_post_path(self):
+        return f"/_{self.id}"
+
+    def get_img_path(self):
+        if self.id == "posts":
+            return f"/assets/img/posts/{self.id}"
+        else:
+            return f"/assets/img/posts/blog"
+
+
+COLLECTIONS = {
+    "posts": Collection("posts", "Blog"),
+    "artwork": Collection("artwork", "Artwork")
+}
+
+
 class Picture:
     def __init__(self, collection):
         self.original_filename = ""
@@ -14,14 +37,11 @@ class Picture:
         self.label = ""
         self.collection = collection  # Reference to the post's collection
 
-    def get_collection(self):
-        return self.collection[0]
-
     def get_original_path(self):
-        return f"/assets/img/posts/{self.get_collection()}/{self.original_filename}"
+        return f"{self.collection.get_img_path()}/{self.original_filename}"
 
     def get_thumbnail_path(self):
-        return f"/assets/img/posts/{self.get_collection()}/thumbs/{self.thumbnail_filename}"
+        return f"{self.collection.get_img_path()}/thumbs/{self.thumbnail_filename}"
 
     def has_label(self):
         if len(self.label) > 0:
@@ -53,7 +73,7 @@ class Picture:
 
 
 class Post:
-    def __init__(self):
+    def __init__(self, collection):
         self.id = "blankpost"  # Used in the internal name
         self.title = "Blank Post"  # Display name
         self.priority_thumbnail = ""  # Optional thumbnail override
@@ -61,10 +81,7 @@ class Post:
         self.body = ""
         self.tags = []
         self.pictures = []  # Attached pictures
-
-        # Internal name of the post's collection (posts, walls...)
-        self.collection = [None]
-        self.set_collection("posts")
+        self.collection = collection
 
     def set_date(self, year, month, day):
         year, month, day = int(year), int(month), int(day)
@@ -78,15 +95,8 @@ class Post:
 
             return p
 
-    def set_collection(self, collection):
-        # Wrapped in an array so it can be passed by reference
-        self.collection[0] = collection
-
-    def get_collection(self):
-        return self.collection[0]
-
     def is_picturepost(self):
-        return self.get_collection() != "posts"
+        return self.collection.id != "posts"
 
     def get_internal_name(self):
         # YYYY-mm-dd-id, used for the filename
@@ -96,13 +106,8 @@ class Post:
         # is this really needed anymore?
         return f"{self.get_internal_name()}.md"
 
-    def get_thumbnail_path(self):
-        collection_foldername = self.get_collection()
-
-        if collection_foldername == "posts":
-            collection_foldername = "blog"
-
-        return f"/assets/img/posts/{collection_foldername}/thumbs/{self.priority_thumbnail}"
+    def get_prioritythumbnail_path(self):
+        return f"{self.collection.get_img_path()}/thumbs/{self.priority_thumbnail}"
 
     def get_pictures_dicts(self):
         dicts = []
@@ -122,7 +127,7 @@ class Post:
             d.update({"pictures": self.get_pictures_dicts()})
 
         if len(self.priority_thumbnail) > 0:
-            d.update({"prioritythumb": self.get_thumbnail_path()})
+            d.update({"prioritythumb": self.get_prioritythumbnail_path()})
 
         if len(self.tags) > 0:
             d.update({"tags": self.tags})
@@ -225,15 +230,13 @@ def post_from_file(filepath):
             metadata = basename[:-3]  # trim file extension (always .md)
             metadata = metadata.split("-")  # split year, month, day and ID
 
-            post = Post()
-            post.set_date(metadata[0], metadata[1], metadata[2])
-            post.id = metadata[3]
-
             # Retrieve collection from the post's containing folder's name
             collection_name = path.dirname(filepath).split("/")[-1]
             collection_name = collection_name[1:]  # shave off the underscore
 
-            post.set_collection(collection_name)
+            post = Post(COLLECTIONS[collection_name])
+            post.set_date(metadata[0], metadata[1], metadata[2])
+            post.id = metadata[3]
 
             # Setup post properties
             post.title = props["title"]
