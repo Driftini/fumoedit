@@ -18,9 +18,9 @@ class Collection:
 
     def get_img_path(self):
         if self.id == "posts":
-            return f"/assets/img/posts/{self.id}"
-        else:
             return f"/assets/img/posts/blog"
+        else:
+            return f"/assets/img/posts/{self.id}"
 
 
 COLLECTIONS = {
