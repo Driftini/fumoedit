@@ -192,7 +192,7 @@ def post_from_file(filepath):
             post_version = CURRENT_POST_VERSION
 
             if (
-                "[" in parts[0]
+                "tags" not in parts[0] and "[" in parts[0]
                 or "maxres" in parts[0]
                 or "lowres" in parts[0]
             ):
