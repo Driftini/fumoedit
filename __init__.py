@@ -109,6 +109,19 @@ class Post:
     def get_prioritythumbnail_path(self):
         return f"{self.collection.get_img_path()}/thumbs/{self.priority_thumbnail}"
 
+    def get_tags(self):
+        # return the post's tags as a pretty string
+        tags = ""
+
+        for t in self.tags:
+            tags += t
+
+            # add comma if this is not the last tag
+            if t != self.tags[-1]:
+                tags += ","
+
+        return tags
+
     def get_pictures_dicts(self):
         dicts = []
 
