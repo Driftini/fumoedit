@@ -118,7 +118,7 @@ class Post:
 
             # add comma if this is not the last tag
             if t != self.tags[-1]:
-                tags += ","
+                tags += ", "
 
         return tags
 
