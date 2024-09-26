@@ -109,6 +109,18 @@ class Post:
     def get_prioritythumbnail_path(self):
         return f"{self.collection.get_img_path()}/thumbs/{self.priority_thumbnail}"
 
+    def has_thumbnail(self):
+        return len(self.priority_thumbnail) > 0 or self.is_picturepost()
+
+    def get_thumbnail_withoffset(self):
+        if len(self.priority_thumbnail) > 0:
+            return self.get_prioritythumbnail_path(), 50
+        elif self.is_picturepost():
+            return self.pictures[0].get_thumbnail_path(), self.pictures[0].thumbnail_offset
+
+    def get_thumbnail(self):
+        return self.get_thumbnail_withoffset()[0]
+
     def get_tags(self):
         # return the post's tags as a pretty string
         tags = ""
