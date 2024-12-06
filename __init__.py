@@ -10,8 +10,6 @@ class Collection:
     def __init__(self, id, label):
         self.id = id
         self.label = label
-        # img_id only really exists because
-        # of blog using both "posts" and "blog"
 
     def get_post_path(self):
         return f"/_{self.id}"
@@ -185,8 +183,14 @@ def filename_valid(filename):
 
 
 def post_to_file(post, folderpath):
-    # Post files can be freely saved to any folder
-    # (collection info may be lost because of poor design)
+    # Post files can technically be freely saved to any folder
+    # but Fumoedit-QT supplies this function with the path to
+    # the site repo, ensuring that no collection info and such
+    # is lost
+
+    # Still, it would be wise to move the whole site path thing
+    # over to fumoedit eventually
+
     folderpath = path.normpath(folderpath)
 
     with open(f"{folderpath}/{post.get_filename()}",
