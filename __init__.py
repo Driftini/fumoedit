@@ -178,7 +178,7 @@ class Post:
 
 def filename_valid(filename):
     # Verify if filename follows the YYYY-MM-DD-ID.md format
-    if re.search("^\d{4}-\d{2}-\d{2}-.+(\.md)$", filename):
+    if re.search(r"^\d{4}-\d{2}-\d{2}-.+(\.md)$", filename):
         return True
     else:
         return False
