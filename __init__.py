@@ -1,5 +1,5 @@
 from datetime import date
-from os import path
+from os import path, sep
 import re
 import yaml
 
@@ -261,7 +261,7 @@ def post_from_file(filepath):
             metadata = metadata.split("-")  # split year, month, day and ID
 
             # Retrieve collection from the post's containing folder's name
-            collection_name = path.dirname(filepath).split("/")[-1]
+            collection_name = path.dirname(filepath).split(sep)[-1]
             collection_name = collection_name[1:]  # shave off the underscore
 
             post = Post(COLLECTIONS[collection_name])
