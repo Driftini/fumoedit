@@ -1,24 +1,36 @@
 from datetime import date
 from os import path, sep
+from os.path import normpath as norm
 import re
 import yaml
 
 CURRENT_POST_VERSION = 3
-
+site_path = norm("/")
 
 class Collection:
     def __init__(self, id, label):
         self.id = id
         self.label = label
 
+    # Getters
+
     def get_post_path(self):
         return f"/_{self.id}"
+
 
     def get_img_path(self):
         if self.id == "posts":
             return f"/assets/img/posts/blog"
         else:
             return f"/assets/img/posts/{self.id}"
+
+    # OS path getters
+
+    def get_post_ospath(self):
+        return norm(site_path+sep+self.get_post_path())
+
+    def get_img_ospath(self):
+        return norm(site_path, self.get_img_path())
 
 
 COLLECTIONS = {
@@ -34,6 +46,8 @@ class Picture:
         self.thumbnail_offset = 50
         self.label = ""
         self.collection = collection  # Reference to the post's collection
+
+    # Checks and getters
 
     def get_original_path(self):
         return f"{self.collection.get_img_path()}/{self.original_filename}"
@@ -52,6 +66,16 @@ class Picture:
             return self.label
         else:
             return "<no label>"
+
+    # OS path getters
+
+    def get_original_ospath(self):
+        return norm(site_path+sep+self.get_original_path())
+
+    def get_thumbnail_ospath(self):
+        return norm(site_path+sep+self.get_thumbnail_path())
+
+    # Post generation stuff
 
     def get_dict(self):
         d = {
@@ -93,6 +117,8 @@ class Post:
 
             return p
 
+    # Checks and getters
+
     def is_picturepost(self):
         return self.collection.id != "posts"
 
@@ -131,6 +157,24 @@ class Post:
                 tags += ", "
 
         return tags
+
+    # OS path getters
+
+    def get_ospath(self):
+        return norm(self.collection.get_post_ospath()+sep+self.get_filename())
+
+    def get_prioritythumbnail_ospath(self):
+        return norm(site_path+sep+self.get_prioritythumbnail_path())
+
+    def get_thumbnail_ospath_withoffset(self):
+        temp = self.get_thumbnail_withoffset()
+        temp[0] = norm(site_path+sep+temp[0])
+        return norm(site_path+sep+self.get_thumbnail())
+
+    def get_thumbnail_ospath(self):
+        return norm(site_path+sep+self.get_thumbnail())
+
+    # Post generation stuff
 
     def get_pictures_dicts(self):
         dicts = []
@@ -181,23 +225,11 @@ def filename_valid(filename):
     else:
         return False
 
-
-def post_to_file(post, folderpath):
-    # Post files can technically be freely saved to any folder
-    # but Fumoedit-QT supplies this function with the path to
-    # the site repo, ensuring that no collection info and such
-    # is lost
-
-    # Still, it would be wise to move the whole site path thing
-    # over to fumoedit eventually
-
-    folderpath = path.normpath(folderpath)
-
-    with open(f"{folderpath}/{post.get_filename()}",
-              mode="w", encoding="utf-8") as f:
-        content = post.generate()
-        f.write(content)
-
+def post_to_file(post):
+    if path.exists(post.collection.get_post_ospath()):
+        with open(post.get_ospath(), mode="w", encoding="utf-8") as f:
+            content = post.generate()
+            f.write(content)
 
 def post_from_file(filepath):
     # Determine the version of the given post file,
