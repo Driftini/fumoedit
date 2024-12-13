@@ -56,7 +56,7 @@ class Picture:
     def get_dict(self):
         d = {
             "thumbnail": self.get_thumbnail_path(),
-            "thumbpos": self.thumbnail_offset,
+            "thumbpos": int(self.thumbnail_offset),
             "original": self.get_original_path(),
         }
 
@@ -284,7 +284,7 @@ def post_from_file(filepath):
 
                     picture_obj.original_filename = path.basename(p["original"])
                     picture_obj.thumbnail_filename = path.basename(p["thumbnail"])
-                    picture_obj.thumbnail_offset = p["thumbpos"]
+                    picture_obj.thumbnail_offset = int(p["thumbpos"])
 
                     if "label" in p:
                         picture_obj.label = p["label"]
