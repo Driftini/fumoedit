@@ -167,9 +167,9 @@ class Post:
         return norm(site_path+sep+self.get_prioritythumbnail_path())
 
     def get_thumbnail_ospath_withoffset(self):
-        temp = self.get_thumbnail_withoffset()
-        temp[0] = norm(site_path+sep+temp[0])
-        return norm(site_path+sep+self.get_thumbnail())
+        thumbpath, offset = self.get_thumbnail_withoffset()
+        thumbpath = norm(site_path+sep+thumbpath)
+        return thumbpath, offset
 
     def get_thumbnail_ospath(self):
         return norm(site_path+sep+self.get_thumbnail())
