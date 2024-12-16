@@ -131,8 +131,7 @@ class Post:
             # Sort tags based on reference_dict while removing duplicates
             self.tags = sorted(
                 set(self.tags),
-                key=lambda x: reference_dict[x] if x in reference_dict else 0,
-                reverse=True
+                key=lambda x: reference_dict[x] if x in reference_dict else 0
             )
 
     # Checks and getters
