@@ -7,6 +7,9 @@ import yaml
 CURRENT_POST_VERSION = 3
 site_path = norm("/")
 
+# Posts will order their tag list according to this list
+tag_priority = []
+
 class Collection:
     def __init__(self, id, label):
         self.id = id
@@ -117,6 +120,21 @@ class Post:
 
             return p
 
+    def normalize_tags(self):
+        # Order tags to match the tag_priority list
+        # and get rid of duplicate tags, if any
+
+        if len(self.tags) > 0:
+            # Map tag_priority's values to their indices
+            reference_dict = {value: index for index, value in enumerate(tag_priority)}
+
+            # Sort tags based on reference_dict while removing duplicates
+            self.tags = sorted(
+                set(self.tags),
+                key=lambda x: reference_dict[x] if x in reference_dict else 0,
+                reverse=True
+            )
+
     # Checks and getters
 
     def is_picturepost(self):
@@ -208,6 +226,8 @@ class Post:
         return fm
 
     def generate(self):
+        self.normalize_tags()
+
         gen = f"""\
 ---
 {self.get_frontmatter()}
@@ -308,6 +328,7 @@ def post_from_file(filepath):
 
             if "tags" in props:
                 post.tags = props["tags"]
+                post.normalize_tags()
 
             # Setup post attachments
             if post.is_picturepost() and "pictures" in props:
