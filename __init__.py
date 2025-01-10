@@ -251,8 +251,8 @@ def post_to_file(post):
             f.write(content)
 
 def post_from_file(filepath):
-    # Determine the version of the given post file,
-    # and call the according post_from_vX method
+    # Return a Post object after reading the post file at the
+    # given path, updating it to the current structure if needed
     filepath = path.normpath(filepath)
     basename = path.basename(filepath)
 
