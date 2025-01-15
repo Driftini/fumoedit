@@ -170,7 +170,7 @@ class Post:
             tags += t
 
             # add comma if this is not the last tag
-            if t != self.tags[-1]:
+            if t is not self.tags[-1]:
                 tags += ", "
 
         return tags
