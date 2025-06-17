@@ -151,7 +151,7 @@ class Post:
         return f"{self.collection.get_img_path()}/thumbs/{self.priority_thumbnail}"
 
     def has_thumbnail(self):
-        return len(self.priority_thumbnail) > 0 or self.is_picturepost()
+        return len(self.priority_thumbnail) > 0 or (self.is_picturepost() and len(self.pictures) > 0)
 
     def get_thumbnail_withoffset(self):
         if len(self.priority_thumbnail) > 0:
