@@ -21,7 +21,12 @@ class Picture:
         return self.collection[0]
 
     def get_thumbnail_path(self):
-        return f"/assets/img/posts/{self.get_collection()}/thumbs/{self.thumbnail_name}"
+        coll = self.get_collection()
+
+        if coll == "posts":
+            coll = "blog"
+
+        return f"/assets/img/posts/{coll}/thumbs/{self.thumbnail_name}"
 
     def get_full_offset(self):
         x = self.thumbnail_offset[0]
@@ -134,7 +139,12 @@ class Post:
         return f"{self.get_internal_name()}.md"
 
     def get_thumbnail_path(self):
-        return f"/assets/img/posts/{self.get_collection()}/{self.thumbnail}"
+        coll = self.get_collection()
+
+        if coll == "posts":
+            coll = "blog"
+
+        return f"/assets/img/posts/{coll}/{self.thumbnail}"
 
     def get_excerpt(self):
         # Trimmed body, used in collection index pages
