@@ -144,7 +144,7 @@ class Post:
         if coll == "posts":
             coll = "blog"
 
-        return f"/assets/img/posts/{coll}/{self.thumbnail}"
+        return f"/assets/img/posts/{coll}/thumbs/{self.thumbnail}"
 
     def get_excerpt(self):
         # Trimmed body, used in collection index pages
